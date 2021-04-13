@@ -5,11 +5,12 @@ from tests.base_test import BaseTest
 
 class StoreTest(BaseTest):
     def test_create_store_items_empty(self):
-        store = StoreModel('test')
-        
-        self.assertListEqual(store.items.all(),[],
-                             "The store's items length was not 0 even though no items were added.")
-        
+        with self.app_context():
+            store = StoreModel('test')
+            store.save_to_db()
+            
+            self.assertListEqual(store.items.all(), [], 
+                                "The store's items length was not 0 even though no items were added.")    
     
     def test_crud(self):
         with self.app_context():
@@ -39,14 +40,15 @@ class StoreTest(BaseTest):
 
 
     def test_store_json(self):
-        store = StoreModel('test')
-        expected = {
-            'id': None,
-            'name': 'test',
-            'items': []
-            }
-        
-        self.assertDictEqual(store.json(), expected)
+        with self.app_context():
+            store = StoreModel('test')
+            store.save_to_db()
+            expected = {
+                'id': 1,
+                'name': 'test',
+                'items': []
+                }
+            self.assertDictEqual(store.json(), expected)
         
     def test_store_json_with_item(self):
         with self.app_context():
